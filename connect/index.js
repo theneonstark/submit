@@ -9,13 +9,14 @@ const UserSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-    mail: {
+    email: {
         type: String,
         require: true,
+        unique: true,
     },
 });
 
-const User = mongoose.model('user_datas', UserSchema);
+const User = mongoose.model('user', UserSchema);
 UserSchema.clearIndexes();
 
 const express = require('express');
@@ -28,21 +29,22 @@ app.get('/',(req, resp)=>{
     resp.send('Finally working');
 });
 
-app.post("/submit", async (req, res) => {
+app.post("/submit", async (req, resp) => {
     try {
         const user = new User(req.body);
         let result = await user.save();
         result = result.toObject();
-        if( result ) {
+        if (result) {
             delete result.password;
-            res.send(req.body);
+            resp.send(req.body);
             console.log(result);
-        }else{
-            console.log("User already register");
+        } else {
+            console.log("user already registered");
         }
-    }catch (e) {
-        res.send("Something Went Wrong");
+    } catch (e) {
+        console.error("Error saving user:", e);
     }
-})
+});
+
 
 app.listen(9000);
